@@ -113,6 +113,17 @@ PRODUCT_CATEGORIES = {
 # ── Helpers ───────────────────────────────────────────────────────────────────
 @st.cache_resource
 def load_model():
+    """Load model, auto-training it if the .pkl doesn't exist yet (HF Spaces friendly)."""
+    from pathlib import Path as _P
+    pkl = _P(__file__).parent.parent / "data" / "processed" / "demand_model.pkl"
+    if not pkl.exists():
+        with st.spinner("First launch: training demand model... (~10 seconds)"):
+            from src.data_collection.data_simulator import simulate_sales, OUTPUT_PATH
+            from src.models.demand_model import train
+            df = simulate_sales()
+            OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
+            df.to_csv(OUTPUT_PATH, index=False)
+            train(df)
     try:
         from src.models.demand_model import load_model as _l
         return _l()
