@@ -211,7 +211,14 @@ if model is None:
     st.stop()
 
 from src.optimizer.price_optimizer import get_optimal_price
-result = get_optimal_price(model, context, price_min, price_max, cost_price)
+try:
+    result = get_optimal_price(model, context, price_min, price_max, cost_price)
+except Exception as e:
+    import traceback
+    st.error(f"Error calling get_optimal_price: {e}")
+    st.code(traceback.format_exc())
+    st.stop()
+    
 conf_label, conf_color = confidence_score(model, result)
 delta_price   = result["optimal_price"] - current_price
 
