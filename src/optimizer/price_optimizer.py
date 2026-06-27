@@ -14,6 +14,7 @@ def get_optimal_price(
     context: dict,
     price_min: float = 50.0,
     price_max: float = 500.0,
+    cost_price: float = 0.0,
 ) -> dict:
     """
     Find the price that maximizes expected revenue.
@@ -31,6 +32,7 @@ def get_optimal_price(
             optimal_price   — suggested price (₹)
             expected_demand — predicted units at optimal price
             expected_revenue— optimal_price × expected_demand
+            expected_profit — (optimal_price - cost_price) × expected_demand
             confidence      — placeholder for confidence score
 
     TODO:
@@ -41,23 +43,31 @@ def get_optimal_price(
     """
     from src.models.demand_model import FEATURES
 
-    def neg_revenue(price: float) -> float:
+    def neg_profit(price: float) -> float:
         row = {**context, "price": price}
         X   = pd.DataFrame([row])[FEATURES]
         demand = max(0, float(model.predict(X)[0]))
-        return -(price * demand)  # minimize negative = maximize revenue
+        return -((price - cost_price) * demand)  # minimize negative = maximize profit
 
-    result = minimize_scalar(neg_revenue, bounds=(price_min, price_max),
+    result = minimize_scalar(neg_profit, bounds=(price_min, price_max),
                              method="bounded")
 
     optimal_price    = round(result.x, 2)
-    expected_demand  = round(-result.fun / optimal_price, 1) if optimal_price > 0 else 0
-    expected_revenue = round(-result.fun, 2)
+    
+    # Calculate demand and revenue at optimal price
+    row = {**context, "price": optimal_price}
+    X = pd.DataFrame([row])[FEATURES]
+    expected_demand = max(0, float(model.predict(X)[0]))
+    
+    expected_demand  = round(expected_demand, 1)
+    expected_revenue = round(optimal_price * expected_demand, 2)
+    expected_profit  = round((optimal_price - cost_price) * expected_demand, 2)
 
     return {
         "optimal_price":    optimal_price,
         "expected_demand":  expected_demand,
         "expected_revenue": expected_revenue,
+        "expected_profit":  expected_profit,
         "confidence":       "medium",   # TODO: derive from model uncertainty
     }
 
@@ -75,7 +85,8 @@ if __name__ == "__main__":
         "day_of_week":      6,
         "temperature":      32.0,
     }
-    result = get_optimal_price(model, context)
+    result = get_optimal_price(model, context, cost_price=90.0)
     print(f"Optimal Price   : ₹{result['optimal_price']}")
     print(f"Expected Demand : {result['expected_demand']} units")
     print(f"Expected Revenue: ₹{result['expected_revenue']}")
+    print(f"Expected Profit : ₹{result['expected_profit']}")

@@ -1,0 +1,386 @@
+[
+  {
+    "product_name": "Aashirvaad Atta/Godihittu - Whole Wheat 5 kg",
+    "price": 263.5,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311638"
+  },
+  {
+    "product_name": "Nandini Pure Ghee/Tuppa 1 L",
+    "price": 649.0,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311663"
+  },
+  {
+    "product_name": "bb Royal Sona Masoori Rice/Akki Raw Rice/Akki - Super Premium 10 kg",
+    "price": 615.0,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311672"
+  },
+  {
+    "product_name": "bb Popular Toor/Arhar Dal 1 kg",
+    "price": 119.0,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311679"
+  },
+  {
+    "product_name": "Fortune Premium Kachi Ghani Pure Mustard Oil 1 L",
+    "price": 137.43,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311685"
+  },
+  {
+    "product_name": "Tata Sampann Unpolished Toor Dal/Arhar Dal 2 kg",
+    "price": 314.0,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311691"
+  },
+  {
+    "product_name": "bb Popular Peanuts/Kadalekayi - Raw 1 kg",
+    "price": 215.0,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311696"
+  },
+  {
+    "product_name": "Tata Salt Vacuum Evaporated Iodised Salt 1 kg",
+    "price": 28.0,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311701"
+  },
+  {
+    "product_name": "Aashirvaad Select MP Sharbati Atta 1 kg",
+    "price": 71.0,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311711"
+  },
+  {
+    "product_name": "bb Popular Cashew/Godambi - Whole 1 kg",
+    "price": 1118.0,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311716"
+  },
+  {
+    "product_name": "Tata Sampann Moong Dal/Hesaru Bele 1 kg",
+    "price": 180.0,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311722"
+  },
+  {
+    "product_name": "Gold Winner Refined Sunflower Oil 1 L",
+    "price": 179.0,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311727"
+  },
+  {
+    "product_name": "bb Royal Cumin/Jeera/Jeerige - Whole 1 kg",
+    "price": 491.0,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311732"
+  },
+  {
+    "product_name": "Akshayakalpa Organic Cow Ghee/Tuppa 490 ml",
+    "price": 791.0,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311737"
+  },
+  {
+    "product_name": "Aashirvaad Atta With Multigrains 10 kg",
+    "price": 624.6,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311742"
+  },
+  {
+    "product_name": "Madhur Sugar 1 kg",
+    "price": 57.77,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311747"
+  },
+  {
+    "product_name": "Dhara  VitAE Refined Sunflower Oil 1 L",
+    "price": 195.0,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311752"
+  },
+  {
+    "product_name": "Fortune Sunlite Refined Sunflower Oil 840 g",
+    "price": 151.5,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311757"
+  },
+  {
+    "product_name": "Fortune Rice Bran Health Physically Refined Oil 3x870 g",
+    "price": 513.0,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311765"
+  },
+  {
+    "product_name": "bb Royal Sona Masoori Steam Rice/Akki 5 kg",
+    "price": 330.0,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311770"
+  },
+  {
+    "product_name": "Tata Sampann California Almonds 200 g",
+    "price": 251.16,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311775"
+  },
+  {
+    "product_name": "Tata Sampann Premium Cashews 500 g",
+    "price": 569.0,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311780"
+  },
+  {
+    "product_name": "bb Popular Sugar/Sakkare 5 kg",
+    "price": 289.1,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311785"
+  },
+  {
+    "product_name": "bb Royal Toor Dal/Togari Bele - Desi 1 kg",
+    "price": 162.0,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311789"
+  },
+  {
+    "product_name": "Freedom Refined Sunflower Oil 1 L",
+    "price": 179.0,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311794"
+  },
+  {
+    "product_name": "Aashirvaad Organic Whole Wheat Atta 5 kg",
+    "price": 311.5,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311799"
+  },
+  {
+    "product_name": "bb Popular Almond/Badam - Californian, Giri 1 kg",
+    "price": 1112.0,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311804"
+  },
+  {
+    "product_name": "Parry's White Label Sugar 5 kg",
+    "price": 311.38,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311809"
+  },
+  {
+    "product_name": "GRB Ghee/Tuppa 200 ml",
+    "price": 174.0,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311816"
+  },
+  {
+    "product_name": "BB Royal Organic Raw Peanuts/Kadalekayi 1 kg",
+    "price": 229.0,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311821"
+  },
+  {
+    "product_name": "Dhara  Kachi Ghani Mustard Oil 1 L",
+    "price": 198.96,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311826"
+  },
+  {
+    "product_name": "Idhayam Gingelly Oil 500 ml",
+    "price": 207.0,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311830"
+  },
+  {
+    "product_name": "BB Royal Organic Toor Dal/Togari Bele 5 kg",
+    "price": 840.0,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311835"
+  },
+  {
+    "product_name": "bb Popular Moong Dal/Hesaru Bele 500 g",
+    "price": 74.97,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311840"
+  },
+  {
+    "product_name": "bb Popular Phool Makhana 100 g",
+    "price": 132.5,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311845"
+  },
+  {
+    "product_name": "bb Royal Rice/Akki - Raw, Sona Masoori, 12-17 Months Old 10 kg",
+    "price": 645.0,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311849"
+  },
+  {
+    "product_name": "bb Royal Jumbo Phool Makhana 200 g",
+    "price": 353.0,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311854"
+  },
+  {
+    "product_name": "Tata Sampann Thick Poha 1 kg",
+    "price": 90.0,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311859"
+  },
+  {
+    "product_name": "Tata Sampann Urad Dal/Uddina Bele Whole White 1 kg",
+    "price": 205.0,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311863"
+  },
+  {
+    "product_name": "Tata Simply Better Pure & Unrefined Cold Pressed Groundnut Oil 1 L",
+    "price": 362.5,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311868"
+  },
+  {
+    "product_name": "bb Royal Idli/Idly Rice 1 kg",
+    "price": 61.0,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311873"
+  },
+  {
+    "product_name": "India Gate Basmati Rice/Basmati Akki - Feast Rozzana 1 kg",
+    "price": 110.92,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311880"
+  },
+  {
+    "product_name": "bb Royal MP Sharbati Whole Wheat Atta - Fortified 10 kg",
+    "price": 532.0,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311885"
+  },
+  {
+    "product_name": "bb Popular Rice/Akki - Steam, Sona Masoori 5 kg",
+    "price": 319.0,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311890"
+  },
+  {
+    "product_name": "Daawat Rozana Super Basmati Rice 5 kg",
+    "price": 402.8,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311894"
+  },
+  {
+    "product_name": "Tata Sampann Fine Besan/Kadale Hittu - 100% Chana Dal 1 kg",
+    "price": 139.73,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311899"
+  },
+  {
+    "product_name": "Saffola Gold Multi-Source Rice Bran & Sunflower Edible Oil 910 g",
+    "price": 206.5,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311904"
+  },
+  {
+    "product_name": "bb Royal Sooji/Bombay Rava 1 kg",
+    "price": 63.0,
+    "currency": "INR",
+    "source_url": "https://www.bigbasket.com/cl/foodgrains-oil-masala/?nc=nb&page=1",
+    "in_stock": true,
+    "scraped_at": "2026-06-28T02:29:08.311908"
+  }
+]

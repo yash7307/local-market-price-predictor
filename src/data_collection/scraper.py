@@ -29,6 +29,7 @@ from dataclasses import dataclass
 from typing import Optional
 import requests
 from bs4 import BeautifulSoup
+import json
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format="%(levelname)s | %(message)s")
@@ -136,6 +137,88 @@ def scrape_prices(
     return results
 
 
+def scrape_bigbasket(
+    category_slug: str = "foodgrains-oil-masala",
+    max_pages: int = 1
+) -> list[ProductPrice]:
+    """
+    Scrape BigBasket category using their embedded JSON data (__NEXT_DATA__).
+    
+    Args:
+        category_slug: URL slug for the category, e.g. 'foodgrains-oil-masala'
+        max_pages: Number of pages to scrape
+        
+    Returns:
+        List of ProductPrice objects
+    """
+    results = []
+    
+    for page in range(1, max_pages + 1):
+        url = f"https://www.bigbasket.com/cl/{category_slug}/?nc=nb&page={page}"
+        logger.info(f"Scraping BigBasket: {url}")
+        
+        soup = fetch_page(url)
+        if not soup:
+            continue
+            
+        next_data_script = soup.find('script', id='__NEXT_DATA__')
+        if not next_data_script:
+            logger.warning(f"__NEXT_DATA__ not found on {url}")
+            continue
+            
+        try:
+            data = json.loads(next_data_script.string)
+        except json.JSONDecodeError:
+            logger.error("Failed to parse JSON")
+            continue
+            
+        # Recursive search for 'products' list
+        def find_products(obj):
+            if isinstance(obj, dict):
+                for k, v in obj.items():
+                    if k == 'products' and isinstance(v, list) and len(v) > 0 and 'pricing' in v[0]:
+                        return v
+                    res = find_products(v)
+                    if res: return res
+            elif isinstance(obj, list):
+                for item in obj:
+                    res = find_products(item)
+                    if res: return res
+            return None
+
+        products = find_products(data)
+        if products:
+            for p in products:
+                desc = p.get('desc', 'Unknown')
+                brand = p.get('brand', {}).get('name', 'Unknown')
+                weight = p.get('w', '')
+                full_name = f"{brand} {desc} {weight}".strip()
+                
+                pricing = p.get('pricing', {})
+                discount = pricing.get('discount', {})
+                prim_price = discount.get('prim_price', {})
+                
+                sp_str = prim_price.get('sp')
+                mrp_str = discount.get('mrp')
+                
+                try:
+                    # Prefer sale price if available, else MRP
+                    price = float(sp_str) if sp_str else float(mrp_str)
+                    
+                    results.append(ProductPrice(
+                        product_name=full_name,
+                        price=price,
+                        source_url=url,
+                    ))
+                except (ValueError, TypeError):
+                    continue
+                    
+        time.sleep(REQUEST_DELAY_SECONDS)
+        
+    logger.info(f"Successfully scraped {len(results)} products from BigBasket ({category_slug})")
+    return results
+
+
 # ── Simulated Fallback (for demo / testing) ───────────────────────────────────
 
 # A mapping of product categories → realistic competitor price ranges (₹)
@@ -160,18 +243,46 @@ def get_competitor_price(
 ) -> dict:
     """
     Return simulated competitor price data for a product.
-
-    In production, replace this with real scraped data.
+    If real scraped data is available in data/raw/bb_competitor_prices.json, it will be used instead.
 
     Args:
-        product_key:      Key from SIMULATED_PRICE_RANGES.
-        num_competitors:  How many competitor prices to simulate.
+        product_key:      Key from SIMULATED_PRICE_RANGES or category name.
+        num_competitors:  How many competitor prices to return.
         seed:             Random seed for reproducibility.
 
     Returns:
         dict with keys: product, min_price, max_price, avg_price, competitors
     """
     import numpy as np
+    from pathlib import Path
+    
+    # Try to load real scraped data first
+    bb_data_path = Path(__file__).parents[2] / "data" / "raw" / "bb_competitor_prices.json"
+    if bb_data_path.exists():
+        try:
+            with open(bb_data_path, "r") as f:
+                bb_prices = json.load(f)
+            
+            if bb_prices:
+                # Randomly sample from real prices to provide variety
+                rng = np.random.default_rng(seed)
+                sample = rng.choice(bb_prices, size=min(num_competitors, len(bb_prices)), replace=False)
+                
+                prices = [p["price"] for p in sample]
+                
+                return {
+                    "product": f"Real Data ({len(bb_prices)} scraped)",
+                    "min_price": round(min(prices), 2),
+                    "max_price": round(max(prices), 2),
+                    "avg_price": round(sum(prices) / len(prices), 2),
+                    "competitors": [
+                        {"name": p["product_name"][:30] + "..." if len(p["product_name"]) > 30 else p["product_name"], 
+                         "price": p["price"]}
+                        for p in sample
+                    ],
+                }
+        except Exception as e:
+            logger.warning(f"Failed to load real data: {e}. Falling back to simulation.")
 
     if product_key not in SIMULATED_PRICE_RANGES:
         product_key = "rice_5kg"   # default fallback
@@ -210,10 +321,23 @@ def get_competitor_price(
 
 
 if __name__ == "__main__":
-    # Demo: simulated competitor prices for rice
-    data = get_competitor_price("rice_5kg")
-    print(f"\nProduct  : {data['product']}")
-    print(f"Avg Price: ₹{data['avg_price']}")
-    print(f"Range    : ₹{data['min_price']} – ₹{data['max_price']}")
-    for c in data["competitors"]:
-        print(f"  {c['name']}: ₹{c['price']}")
+    # Demo: Scrape real data from BigBasket
+    print("Scraping real competitor prices from BigBasket...")
+    bb_prices = scrape_bigbasket("foodgrains-oil-masala", max_pages=1)
+    
+    if bb_prices:
+        print(f"\nFound {len(bb_prices)} products.")
+        print("\nTop 5 products:")
+        for p in bb_prices[:5]:
+            print(f"  - {p.product_name}: Rs. {p.price}")
+            
+        # Save to JSON for analysis/dashboard
+        from pathlib import Path
+        output_path = Path(__file__).parents[2] / "data" / "raw" / "bb_competitor_prices.json"
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        with open(output_path, "w") as f:
+            json.dump([p.__dict__ for p in bb_prices], f, indent=2)
+        print(f"\nSaved scraped data to {output_path}")
+    else:
+        print("Failed to scrape BigBasket.")

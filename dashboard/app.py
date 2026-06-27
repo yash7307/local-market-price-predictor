@@ -130,14 +130,15 @@ def load_model():
     except Exception:
         return None
 
-def build_curve(model, ctx, pmin, pmax, n=80):
+def build_curve(model, ctx, pmin, pmax, cost_price, n=80):
     from src.models.demand_model import FEATURES
-    prices, revenues, demands = [], [], []
+    prices, revenues, demands, profits = [], [], [], []
     for p in np.linspace(pmin, pmax, n):
         row = {**ctx, "price": p}
         d   = max(0, float(model.predict(pd.DataFrame([row])[FEATURES])[0]))
-        prices.append(round(p,2)); demands.append(round(d,1)); revenues.append(round(p*d,2))
-    return pd.DataFrame({"price": prices, "demand": demands, "revenue": revenues})
+        prices.append(round(p,2)); demands.append(round(d,1))
+        revenues.append(round(p*d,2)); profits.append(round((p - cost_price)*d, 2))
+    return pd.DataFrame({"price": prices, "demand": demands, "revenue": revenues, "profit": profits})
 
 def confidence_score(model, result):
     """Derive a simple confidence from R² proxy."""
@@ -168,6 +169,7 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("**Market Inputs**")
     current_price    = st.slider("Your Current Price (₹)", pmin_default, pmax_default, price_default)
+    cost_price       = st.number_input("Cost Price / Unit (₹)", value=float(int(price_default*0.6)), step=5.0)
     competitor_price = st.number_input("Competitor Price (₹)", value=float(int(price_default*0.95)), step=5.0)
     inventory        = st.slider("Inventory (units)", 0, 500, 100)
 
@@ -209,22 +211,26 @@ if model is None:
     st.stop()
 
 from src.optimizer.price_optimizer import get_optimal_price
-result = get_optimal_price(model, context, price_min, price_max)
+result = get_optimal_price(model, context, price_min, price_max, cost_price)
 conf_label, conf_color = confidence_score(model, result)
 delta_price   = result["optimal_price"] - current_price
-current_rev   = current_price * max(0, float(model.predict(
+
+_curr_d = max(0, float(model.predict(
     pd.DataFrame([{**context, "price": current_price}])[
         ["price","competitor_price","is_weekend","is_festival","inventory","month","day_of_week","temperature"]
     ])[0]))
-rev_gain      = result["expected_revenue"] - current_rev
-rev_gain_pct  = (rev_gain / current_rev * 100) if current_rev > 0 else 0
+current_rev    = current_price * _curr_d
+current_profit = (current_price - cost_price) * _curr_d
+profit_gain    = result["expected_profit"] - current_profit
+profit_gain_pct = (profit_gain / current_profit * 100) if current_profit > 0 else 0
 
 # ── Tabs ──────────────────────────────────────────────────────────────────────
 tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "🎯 Price Optimizer",
-    "📊 Revenue Analysis",
+    "📊 Revenue & Profit",
     "🔍 Market Intelligence",
     "📈 Sales History",
+    "📝 Pricing Logs",
     "ℹ️ About",
 ])
 
@@ -237,8 +243,10 @@ with tab1:
     c1.metric("💰 Optimal Price",    f"₹{result['optimal_price']:,.2f}",
               f"{delta_price:+.2f} vs current")
     c2.metric("📦 Expected Demand",  f"{result['expected_demand']:,.0f} units")
-    c3.metric("📈 Expected Revenue", f"₹{result['expected_revenue']:,.0f}",
-              f"{rev_gain_pct:+.1f}% vs static")
+    
+    margin_pct = ((result['optimal_price'] - cost_price) / result['optimal_price'] * 100) if result['optimal_price'] > 0 else 0
+    c3.metric("📈 Expected Profit",  f"₹{result['expected_profit']:,.0f}",
+              f"{margin_pct:.1f}% margin")
     c4.metric("🎯 Confidence",       conf_label)
 
     st.markdown("---")
@@ -246,21 +254,23 @@ with tab1:
     col_a, col_b = st.columns([3, 2])
 
     with col_a:
-        # Revenue curve — compact
-        curve_df = build_curve(model, context, price_min, price_max)
+        # Profit and Revenue curve
+        curve_df = build_curve(model, context, price_min, price_max, cost_price)
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=curve_df["price"], y=curve_df["revenue"],
+            mode="lines", line=dict(color=ACCENT, width=1, dash="dot"), name="Revenue"))
+        fig.add_trace(go.Scatter(x=curve_df["price"], y=curve_df["profit"],
             mode="lines", fill="tozeroy",
-            fillcolor="rgba(108,99,255,0.12)",
-            line=dict(color=ACCENT, width=2.5), name="Revenue"))
+            fillcolor="rgba(0, 214, 143, 0.12)",
+            line=dict(color=GREEN, width=2.5), name="Profit"))
         fig.add_vline(x=result["optimal_price"], line_dash="dash",
             line_color=GREEN, annotation_text=f"Optimal ₹{result['optimal_price']:.0f}",
             annotation_font_color=GREEN)
         fig.add_vline(x=current_price, line_dash="dot",
             line_color=GOLD, annotation_text=f"Current ₹{current_price}",
             annotation_font_color=GOLD)
-        fig.update_layout(**PLOT_LAYOUT, height=320, title="Price vs Revenue Curve",
-            xaxis_title="Price (₹)", yaxis_title="Revenue (₹)")
+        fig.update_layout(**PLOT_LAYOUT, height=320, title="Price vs Profit Curve",
+            xaxis_title="Price (₹)", yaxis_title="Profit/Revenue (₹)")
         st.plotly_chart(fig, use_container_width=True)
 
     with col_b:
@@ -268,7 +278,7 @@ with tab1:
         direction = "raise" if delta_price > 0 else "lower"
         pct_change = abs(delta_price / current_price * 100)
 
-        st.markdown(f"""
+        html_str = f"""
         <div class='card'>
           <p style='color:rgba(255,255,255,0.55);margin:0 0 6px;font-size:0.8rem'>SUGGESTED ACTION</p>
           <p style='font-size:1.5rem;font-weight:700;color:#fff;margin:0'>
@@ -280,12 +290,12 @@ with tab1:
           </p>
         </div>
         <div class='card'>
-          <p style='color:rgba(255,255,255,0.55);margin:0 0 6px;font-size:0.8rem'>REVENUE IMPACT</p>
-          <p style='font-size:1.4rem;font-weight:700;color:{"#00d68f" if rev_gain>=0 else "#ff6b6b"};margin:0'>
-            {"+" if rev_gain >= 0 else ""}₹{rev_gain:,.0f} / day
+          <p style='color:rgba(255,255,255,0.55);margin:0 0 6px;font-size:0.8rem'>PROFIT IMPACT</p>
+          <p style='font-size:1.4rem;font-weight:700;color:{"#00d68f" if profit_gain>=0 else "#ff6b6b"};margin:0'>
+            {"+" if profit_gain >= 0 else ""}₹{profit_gain:,.0f} / day
           </p>
           <p style='color:rgba(255,255,255,0.5);font-size:0.8rem;margin:6px 0 0'>
-            Monthly impact: {"+" if rev_gain>=0 else ""}₹{rev_gain*30:,.0f}
+            Monthly impact: {"+" if profit_gain>=0 else ""}₹{profit_gain*30:,.0f}
           </p>
         </div>
         <div class='card'>
@@ -294,31 +304,49 @@ with tab1:
             {conf_label} Confidence
           </span>
         </div>
-        """, unsafe_allow_html=True)
+        """
+        st.markdown(html_str, unsafe_allow_html=True)
+        
+        # Logging button
+        if st.button("✅ Apply Recommended Price", use_container_width=True, type="primary"):
+            from src.data_collection.db import log_optimization
+            log_id = log_optimization(
+                category=category,
+                current_price=current_price,
+                cost_price=cost_price,
+                competitor_price=competitor_price,
+                inventory=inventory,
+                optimal_price=result['optimal_price'],
+                expected_demand=result['expected_demand'],
+                expected_profit=result['expected_profit'],
+                context=context,
+                action_taken="APPLIED"
+            )
+            st.success(f"Price updated! Log ID: #{log_id}")
 
 # ════════════════════════════════════════════════════════════
-# TAB 2 — Revenue Analysis
+# TAB 2 — Revenue & Profit Analysis
 # ════════════════════════════════════════════════════════════
 with tab2:
     if "curve_df" not in dir():
-        curve_df = build_curve(model, context, price_min, price_max)
+        curve_df = build_curve(model, context, price_min, price_max, cost_price)
 
     c1, c2 = st.columns(2)
 
     with c1:
-        # Dual-axis: Revenue + Demand vs Price
+        # Dual-axis: Profit + Demand vs Price
         fig2 = go.Figure()
-        fig2.add_trace(go.Scatter(x=curve_df["price"], y=curve_df["revenue"],
-            name="Revenue (₹)", line=dict(color=ACCENT, width=2.5),
-            fill="tozeroy", fillcolor="rgba(108,99,255,0.10)"))
+        fig2.add_trace(go.Scatter(x=curve_df["price"], y=curve_df["profit"],
+            name="Profit (₹)", line=dict(color=GREEN, width=2.5),
+            fill="tozeroy", fillcolor="rgba(0, 214, 143, 0.10)"))
         fig2.add_trace(go.Scatter(x=curve_df["price"], y=curve_df["demand"],
             name="Demand (units)", line=dict(color=ACCENT2, width=2, dash="dot"),
             yaxis="y2"))
         fig2.add_vline(x=result["optimal_price"], line_dash="dash",
             line_color=GREEN, annotation_text="Optimal")
         fig2.update_layout(**PLOT_LAYOUT, height=360,
-            title="Revenue & Demand vs Price",
-            xaxis_title="Price (₹)", yaxis_title="Revenue (₹)",
+            title="Profit & Demand vs Price",
+            xaxis_title="Price (₹)", yaxis_title="Profit (₹)",
             yaxis2=dict(title="Demand (units)", overlaying="y", side="right",
                         showgrid=False, color=ACCENT2),
             legend=dict(orientation="h", y=1.12))
@@ -329,32 +357,32 @@ with tab2:
         key_prices = [price_min, price_min+(price_max-price_min)*0.25,
                       current_price, result["optimal_price"],
                       price_min+(price_max-price_min)*0.75, price_max]
-        key_revs, key_demands = [], []
+        key_revs, key_profits = [], []
         from src.models.demand_model import FEATURES
         for p in key_prices:
             row  = {**context, "price": p}
             d    = max(0, float(model.predict(pd.DataFrame([row])[FEATURES])[0]))
             key_revs.append(round(p*d, 0))
-            key_demands.append(round(d, 1))
+            key_profits.append(round((p - cost_price)*d, 0))
         labels = [f"₹{int(p)}" for p in key_prices]
         colors = [GREEN if p == result["optimal_price"] else ACCENT for p in key_prices]
 
-        fig3 = go.Figure(go.Bar(x=labels, y=key_revs,
+        fig3 = go.Figure(go.Bar(x=labels, y=key_profits,
             marker_color=colors,
-            text=[f"₹{int(r):,}" for r in key_revs],
+            text=[f"₹{int(r):,}" for r in key_profits],
             textposition="outside", textfont_color="white"))
         fig3.update_layout(**PLOT_LAYOUT, height=360,
-            title="Revenue at Key Price Points", yaxis_title="Revenue (₹)")
+            title="Profit at Key Price Points", yaxis_title="Profit (₹)")
         st.plotly_chart(fig3, use_container_width=True)
 
     # A/B Impact
-    st.markdown("#### A/B Test: Static vs Dynamic Pricing")
+    st.markdown("#### A/B Test: Static vs Dynamic Pricing (Profit)")
     cols = st.columns(3)
-    cols[0].metric("Static Pricing Revenue",  f"₹{current_rev:,.0f}/day", "Your current price")
-    cols[1].metric("Dynamic Pricing Revenue", f"₹{result['expected_revenue']:,.0f}/day",
-                   f"+₹{rev_gain:,.0f}" if rev_gain >= 0 else f"₹{rev_gain:,.0f}")
-    cols[2].metric("Annual Revenue Gain",     f"₹{rev_gain*365:,.0f}",
-                   f"{rev_gain_pct:+.1f}%")
+    cols[0].metric("Static Pricing Profit",  f"₹{current_profit:,.0f}/day", "Your current price")
+    cols[1].metric("Dynamic Pricing Profit", f"₹{result['expected_profit']:,.0f}/day",
+                   f"+₹{profit_gain:,.0f}" if profit_gain >= 0 else f"₹{profit_gain:,.0f}")
+    cols[2].metric("Annual Profit Gain",     f"₹{profit_gain*365:,.0f}",
+                   f"{profit_gain_pct:+.1f}%")
 
 # ════════════════════════════════════════════════════════════
 # TAB 3 — Market Intelligence
@@ -475,9 +503,40 @@ with tab4:
         st.warning("No sales data found. Run `python train_pipeline.py` first.")
 
 # ════════════════════════════════════════════════════════════
-# TAB 5 — About
+# TAB 5 — Pricing Logs
 # ════════════════════════════════════════════════════════════
 with tab5:
+    st.markdown("#### 📝 Optimization Logs")
+    st.markdown("History of pricing recommendations and actions taken.")
+    
+    try:
+        from src.data_collection.db import get_recent_logs
+        logs = get_recent_logs(20)
+        
+        if logs:
+            log_df = pd.DataFrame(logs)
+            # Format display
+            display_df = log_df[["timestamp", "category", "current_price", "optimal_price", "expected_profit", "action_taken"]].copy()
+            display_df["timestamp"] = pd.to_datetime(display_df["timestamp"]).dt.strftime("%Y-%m-%d %H:%M")
+            display_df.rename(columns={
+                "timestamp": "Time",
+                "category": "Category", 
+                "current_price": "Old Price (₹)",
+                "optimal_price": "New Price (₹)",
+                "expected_profit": "Expected Profit (₹)",
+                "action_taken": "Status"
+            }, inplace=True)
+            
+            st.dataframe(display_df, use_container_width=True, hide_index=True)
+        else:
+            st.info("No pricing logs found yet. Click 'Apply Recommended Price' on the Optimizer tab to generate logs.")
+    except Exception as e:
+        st.warning(f"Could not load logs: {e}")
+
+# ════════════════════════════════════════════════════════════
+# TAB 6 — About
+# ════════════════════════════════════════════════════════════
+with st.tabs(["ℹ️ About"])[0]:
     st.markdown("""
     ## About PriceIQ — Dynamic Pricing Engine
 

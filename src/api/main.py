@@ -5,6 +5,8 @@ Run: uvicorn src.api.main:app --reload --port 8000
 Docs: http://localhost:8000/docs
 """
 
+import os
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
@@ -19,9 +21,13 @@ app = FastAPI(
     version="1.0.0",
 )
 
+# CORS: use ALLOWED_ORIGINS env var in production (comma-separated domains).
+# Defaults to "*" for local development.
+_origins = os.getenv("ALLOWED_ORIGINS", "*").split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -49,12 +55,13 @@ class PricingRequest(BaseModel):
     temperature:      float = Field(30.0, example=32.0)
     price_min:        float = Field(50.0)
     price_max:        float = Field(500.0)
-
+    cost_price:       float = Field(0.0, example=90.0)
 
 class PricingResponse(BaseModel):
     optimal_price:    float
     expected_demand:  float
     expected_revenue: float
+    expected_profit:  float
     confidence:       str
 
 
@@ -94,6 +101,7 @@ def optimize_price(req: PricingRequest):
             },
             price_min=req.price_min,
             price_max=req.price_max,
+            cost_price=req.cost_price,
         )
         return result
     except FileNotFoundError:
@@ -111,9 +119,10 @@ def revenue_curve(
     temperature:      float = 30.0,
     price_min:        float = 50.0,
     price_max:        float = 500.0,
+    cost_price:       float = 0.0,
     points:           int   = 60,
 ):
-    """Returns price vs revenue curve data for chart rendering."""
+    """Returns price vs revenue and profit curve data for chart rendering."""
     try:
         from src.models.demand_model import FEATURES
         model = get_model()
@@ -124,7 +133,12 @@ def revenue_curve(
         for p in np.linspace(price_min, price_max, points):
             row = {**ctx, "price": p}
             d   = max(0, float(model.predict(pd.DataFrame([row])[FEATURES])[0]))
-            rows.append({"price": round(p, 2), "demand": round(d, 1), "revenue": round(p*d, 2)})
+            rows.append({
+                "price": round(p, 2), 
+                "demand": round(d, 1), 
+                "revenue": round(p*d, 2),
+                "profit": round((p - cost_price)*d, 2)
+            })
         return {"curve": rows}
     except FileNotFoundError:
         raise HTTPException(503, "Model not trained.")

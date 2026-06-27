@@ -1,0 +1,81 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# PriceIQ — CI/CD: Build → Push to ECR → Trigger App Runner Re-deploy
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# Required GitHub Secrets:
+#   AWS_ACCESS_KEY_ID       — IAM user access key
+#   AWS_SECRET_ACCESS_KEY   — IAM user secret key
+#   AWS_REGION              — e.g. ap-south-1
+#   AWS_ACCOUNT_ID          — 12-digit AWS account ID
+#
+# Optional Secrets (only if deploying API too):
+#   DEPLOY_API              — set to "true" to also build/push the API image
+#
+
+name: Deploy to AWS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:        # allow manual trigger from GitHub UI
+
+env:
+  ECR_BASE: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+
+jobs:
+  deploy:
+    name: Build & Push to ECR
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # ── Dashboard Image ─────────────────────────────────────────────────
+      - name: Build & push Dashboard image
+        run: |
+          IMAGE=${{ env.ECR_BASE }}/priceiq-dashboard:latest
+          docker build -t priceiq-dashboard .
+          docker tag priceiq-dashboard:latest $IMAGE
+          docker push $IMAGE
+          echo "✅ Dashboard image pushed: $IMAGE"
+
+      # ── API Image (optional) ────────────────────────────────────────────
+      - name: Build & push API image
+        if: ${{ secrets.DEPLOY_API == 'true' }}
+        run: |
+          IMAGE=${{ env.ECR_BASE }}/priceiq-api:latest
+          docker build -f Dockerfile.api -t priceiq-api .
+          docker tag priceiq-api:latest $IMAGE
+          docker push $IMAGE
+          echo "✅ API image pushed: $IMAGE"
+
+      # ── Trigger App Runner Re-deploy ────────────────────────────────────
+      - name: Trigger App Runner deployment (dashboard)
+        run: |
+          # List App Runner services and find the dashboard one
+          SERVICE_ARN=$(aws apprunner list-services \
+            --query "ServiceSummaryList[?ServiceName=='priceiq-dashboard'].ServiceArn" \
+            --output text 2>/dev/null || true)
+
+          if [ -n "$SERVICE_ARN" ] && [ "$SERVICE_ARN" != "None" ]; then
+            echo "🔄 Triggering re-deploy for $SERVICE_ARN"
+            aws apprunner start-deployment --service-arn "$SERVICE_ARN"
+            echo "✅ App Runner deployment triggered!"
+          else
+            echo "ℹ️  No App Runner service named 'priceiq-dashboard' found."
+            echo "   Create the service manually first, then CI/CD will auto-deploy."
+          fi

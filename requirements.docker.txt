@@ -1,0 +1,28 @@
+# Docker-optimised requirements (PyTorch removed — not used by dashboard/API)
+# Core Data
+pandas>=2.0
+numpy>=1.24
+scikit-learn>=1.3
+
+# ML Models
+xgboost>=2.0
+lightgbm>=4.0
+
+# Optimization
+scipy>=1.11
+
+# API
+fastapi>=0.110
+uvicorn>=0.29
+
+# Dashboard
+streamlit>=1.35
+
+# Data Collection
+requests>=2.31
+beautifulsoup4>=4.12
+
+# Utilities
+python-dotenv>=1.0
+joblib>=1.3
+plotly>=5.20
