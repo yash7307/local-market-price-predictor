@@ -232,7 +232,7 @@ profit_gain    = result["expected_profit"] - current_profit
 profit_gain_pct = (profit_gain / current_profit * 100) if current_profit > 0 else 0
 
 # ── Tabs ──────────────────────────────────────────────────────────────────────
-tab1, tab2, tab3, tab4, tab5 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
     "🎯 Price Optimizer",
     "📊 Revenue & Profit",
     "🔍 Market Intelligence",
@@ -543,7 +543,7 @@ with tab5:
 # ════════════════════════════════════════════════════════════
 # TAB 6 — About
 # ════════════════════════════════════════════════════════════
-with st.tabs(["ℹ️ About"])[0]:
+with tab6:
     st.markdown("""
     ## About PriceIQ — Dynamic Pricing Engine
 
